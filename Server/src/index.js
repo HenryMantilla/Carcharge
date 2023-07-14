@@ -3,8 +3,8 @@ import express from "express";
 import cors from "cors";
 import mongoose from "mongoose";
 import morgan from "morgan";
+import cookieParser from "cookie-parser";
 import userRoutes from "./routes/routes.js";
-// import authRoutes from "./routes/auth";
 
 const app = express();
 const connect = async () => {
@@ -22,5 +22,6 @@ const connect = async () => {
 app.use(express.json());
 app.use(express.urlencoded({extended: true}));
 app.use(cors());
+app.use(cookieParser());
 app.use(morgan("dev"));
 app.use("/user", userRoutes);

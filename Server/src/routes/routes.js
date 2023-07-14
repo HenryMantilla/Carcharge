@@ -1,15 +1,15 @@
 import { Router } from "express";
-import { getUsers, getUser, createUser, deleteUser, updateUser } from "../controllers/users.js";
+import { getUsers, signIn, createUser, deleteUser, updateUser, logOut, protectedRoute} from "../controllers/users.js";
+import {verifyToken} from "./validateToken.js";
 
 const router = Router();
-/*
-router.get("/", (req, res) => {
-    res.send("User homepage");
-});
-*/
+
+router.get('/protected', verifyToken, protectedRoute)
+
 router.get('/count', getUsers);
-router.get('/:id', getUser);
-router.post('/', createUser);
+router.get('/logout', verifyToken, logOut);
+router.post('/signIn', signIn);  // Changefrom get to post
+router.post('/signUp', createUser);
 router.delete('/:id', deleteUser);
 router.put('/:id', updateUser);
 

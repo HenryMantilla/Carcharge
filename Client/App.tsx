@@ -1,20 +1,16 @@
-import { StatusBar } from 'expo-status-bar';
-import { StyleSheet, Text, View } from 'react-native';
+import Routes from './src/index';
+import { NavigationContainer } from "@react-navigation/native";
+import { StatusBar } from "react-native";
 
 export default function App() {
   return (
-    <View style={styles.container}>
-      <Text>Here we go!</Text>
-      <StatusBar style="auto" />
-    </View>
+    //<SignIn/>
+    <NavigationContainer>
+      <StatusBar backgroundColor="#38a69d" barStyle="light-content" />
+      <Routes/> 
+  </NavigationContainer>
   );
 }
 
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: '#fff',
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-});
+//<Routes/> Beacuse the function exported is called routes
+

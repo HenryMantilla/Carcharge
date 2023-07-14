@@ -1,6 +1,6 @@
 import mongoose from "mongoose";
 
-var schema = new mongoose.Schema({
+var UserSchema = new mongoose.Schema({
     firstName: {
         type: String,
         required: true
@@ -16,10 +16,12 @@ var schema = new mongoose.Schema({
     },
     password: {
         type:String,
-        required: true
+        required: true,
+        min: 8,
+        max: 64
     },
 });
 
-var userModel = new mongoose.model("user", schema);
+var userModel = new mongoose.model("User", UserSchema);
 
 export default userModel;

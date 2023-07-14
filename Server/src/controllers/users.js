@@ -1,10 +1,16 @@
 import UserModel  from "../models/userModel.js";
+import { hashPassword, comparePassword } from "../helpers/authHashing.js";
+import jwt from "jsonwebtoken";
 
 //Obtain all user from the database
 export const getUsers = async (req, res) => {
     try {
         const users = await UserModel.find();
-        res.status(200).json(users);
+        if(!users){
+            return res.json({ message: "Users not found"});
+        }
+        return res.json({users : users});
+        //res.status(200).json(users);
     }
     catch(error){
         res.status(404).json({ message: error.message });
@@ -18,11 +24,14 @@ export const createUser = async (req, res) => {
         return res.status(400).send({
             message: "User content can not be empty"});
         }
+
+    const hashedPassword = await hashPassword(req.body.password);
+
     const user = new UserModel({
         firstName: req.body.firstName,
         lastName: req.body.lastName,
         email: req.body.email,
-        password: req.body.password
+        password: hashedPassword  // if this generates problem, originally was re.body.password
     });
 
     await user.save().then(data => {
@@ -37,16 +46,37 @@ export const createUser = async (req, res) => {
     });
 };
 
-//find a single user with a userId
-export const getUser = async (req, res) => {
+//find a single user with an email and compare hashed password with the give by the user
+export const signIn = async (req, res) => {
     try{
-        const userxd = await UserModel.findById(req.params.id);
-        res.status(200).json(userxd);
+        const user = await UserModel.findOne({email:req.body.email});
+        if(!user){
+            return res.status(404).json({ message: "Email not found"});
+        }
+
+        const match = await comparePassword(req.body.password, user.password);
+        if(!match){
+            return res.json({ message: "Incorrect password"});
+        }
+
+        const payload = { 
+            email: user.email,
+        }
+        const token = jwt.sign(payload, process.env.JWT_SECRET, {expiresIn: process.env.JWT_EXPIRES_IN});
+
+        return res.cookie("access_token", token, {httpOnly: true}).json({success:true, message:'LoggedIn Successfully'})
     } catch(error){
-        res.status(404).json({ message: error.message });
+        res.status(500).json({ message: error.message });
     }
 };
 
+export const logOut = async (req, res) => {
+    return res.clearCookie("access_token").json({success:true, message:'LoggedOut Successfully'})
+}
+
+export const protectedRoute = async (req, res) => {
+    return res.json({message:'Protected Route access succesfully'})
+}
 
 //update user by a given UserId
 export const updateUser = async (req, res) => {
